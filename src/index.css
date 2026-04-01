@@ -1,0 +1,20 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+:root {
+  --primary-orange: #ff9800;
+  --light-orange: #fff3e0;
+  --orange-hover: #f57c00;
+  --orange-accent: #ff5722;
+  --orange-light-bg: #ffe0b2;
+}
+
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: linear-gradient(to right, var(--light-orange), var(--orange-light-bg));
+  color: #333;
+  min-height: 100vh;
+}

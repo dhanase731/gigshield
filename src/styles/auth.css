@@ -1,0 +1,173 @@
+body {
+  font-family: 'Segoe UI', sans-serif;
+}
+
+.auth-container {
+  display: flex;
+  min-height: 100vh;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+  background: linear-gradient(to right, var(--light-orange), var(--orange-light-bg));
+}
+
+.card {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  padding: 40px;
+  border-radius: 20px;
+  width: 100%;
+  max-width: 380px;
+  box-shadow: 0 15px 35px rgba(255, 152, 0, 0.2);
+  text-align: center;
+  border: 1px solid rgba(255, 152, 0, 0.1);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 20px 45px rgba(255, 152, 0, 0.3);
+}
+
+.card h2 {
+  margin-bottom: 25px;
+  color: var(--primary-orange);
+  font-size: 28px;
+  font-weight: 600;
+}
+
+.card input, .card select {
+  width: 100%;
+  padding: 15px;
+  margin: 12px 0;
+  border-radius: 12px;
+  border: 2px solid #ffd699;
+  background: rgba(255, 255, 255, 0.8);
+  font-size: 16px;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+  box-sizing: border-box;
+}
+
+.card input:focus, .card select:focus {
+  outline: none;
+  border-color: var(--primary-orange);
+  box-shadow: 0 0 0 3px rgba(255, 152, 0, 0.1);
+}
+
+.card button {
+  width: 100%;
+  padding: 15px;
+  background: linear-gradient(135deg, var(--primary-orange), var(--orange-hover));
+  border: none;
+  color: white;
+  border-radius: 12px;
+  margin-top: 15px;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(255, 152, 0, 0.3);
+}
+
+.card button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(255, 152, 0, 0.4);
+}
+
+.card button:active {
+  transform: translateY(0);
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  justify-content: center;
+  margin-bottom: 30px;
+}
+
+.logo {
+  width: 50px;
+  height: 50px;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(255, 152, 0, 0.3);
+}
+
+.brand img {
+  width: 50px;
+  height: 50px;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(255, 152, 0, 0.3);
+}
+
+.phone {
+  display: flex;
+  align-items: center;
+  margin: 12px 0;
+}
+
+.phone span {
+  padding: 15px;
+  background: linear-gradient(135deg, #ffd699, #ffcc80);
+  border-radius: 12px 0 0 12px;
+  color: var(--primary-orange);
+  font-weight: 600;
+}
+
+.phone input {
+  border-radius: 0 12px 12px 0 !important;
+  border-left: none;
+  flex: 1;
+}
+
+.google-btn {
+  background: linear-gradient(135deg, #db4437, #c23321) !important;
+  margin-top: 15px;
+  box-shadow: 0 4px 15px rgba(219, 68, 55, 0.3);
+}
+
+.google-btn:hover {
+  box-shadow: 0 8px 25px rgba(219, 68, 55, 0.4) !important;
+  transform: translateY(-2px);
+}
+
+.remember {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  color: #666;
+  margin: 15px 0;
+  justify-content: flex-start;
+}
+
+.remember input {
+  width: auto;
+  margin: 0;
+}
+
+.card p {
+  margin-top: 20px;
+  color: var(--primary-orange);
+  cursor: pointer;
+  font-weight: 500;
+  transition: color 0.3s ease;
+  text-decoration: none;
+}
+
+.card p:hover {
+  color: var(--orange-hover);
+  text-decoration: underline;
+}
+
+@media (max-width: 480px) {
+  .card {
+    padding: 30px 25px;
+    margin: 10px;
+  }
+  
+  .brand img {
+    width: 40px;
+    height: 40px;
+  }
+}

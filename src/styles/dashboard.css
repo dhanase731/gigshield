@@ -1,0 +1,587 @@
+/* Dashboard Layout */
+.dashboard-layout {
+  display: flex;
+  min-height: 100vh;
+  background: linear-gradient(to bottom, var(--light-orange), white);
+}
+
+/* Sidebar */
+.sidebar {
+  width: 280px;
+  background: rgba(255, 255, 255, 0.95);
+  border-right: 1px solid rgba(255, 152, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  box-shadow: 2px 0 10px rgba(255, 152, 0, 0.1);
+}
+
+.sidebar-header {
+  padding: 25px 20px;
+  border-bottom: 1px solid rgba(255, 152, 0, 0.1);
+}
+
+.logo-container {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+.sidebar-logo {
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  box-shadow: 0 3px 8px rgba(255, 152, 0, 0.2);
+}
+
+.sidebar-header h2 {
+  color: var(--primary-orange);
+  margin: 0 0 8px 0;
+  font-size: 24px;
+}
+
+.user-name {
+  color: #666;
+  font-size: 14px;
+  margin: 0;
+}
+
+.sidebar-nav {
+  flex: 1;
+  padding: 20px 0;
+}
+
+.sidebar-nav ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.sidebar-nav li {
+  margin-bottom: 5px;
+}
+
+.nav-btn {
+  width: 100%;
+  padding: 12px 20px;
+  background: transparent;
+  border: none;
+  text-align: left;
+  cursor: pointer;
+  font-size: 15px;
+  color: #333;
+  transition: all 0.3s ease;
+  border-left: 3px solid transparent;
+}
+
+.nav-btn:hover {
+  background: rgba(255, 152, 0, 0.1);
+  color: var(--primary-orange);
+}
+
+.nav-btn.active {
+  background: rgba(255, 152, 0, 0.15);
+  color: var(--primary-orange);
+  border-left-color: var(--primary-orange);
+  font-weight: 600;
+}
+
+.sidebar-footer {
+  padding: 20px;
+  border-top: 1px solid rgba(255, 152, 0, 0.1);
+}
+
+.logout-btn {
+  width: 100%;
+  padding: 10px;
+  background: linear-gradient(135deg, var(--orange-accent), var(--orange-hover));
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+
+.logout-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(255, 87, 34, 0.3);
+}
+
+/* Main Content */
+.main-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.content-header {
+  background: rgba(255, 255, 255, 0.95);
+  padding: 20px 30px;
+  border-bottom: 1px solid rgba(255, 152, 0, 0.1);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.content-header h1 {
+  color: var(--primary-orange);
+  margin: 0;
+  font-size: 28px;
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.last-sync {
+  color: #666;
+  font-size: 14px;
+}
+
+.content-body {
+  flex: 1;
+  padding: 30px;
+  overflow-y: auto;
+}
+
+/* Overview Container */
+.overview-container .card {
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 15px;
+  padding: 30px;
+  border: 1px solid rgba(255, 152, 0, 0.1);
+  box-shadow: 0 5px 15px rgba(255, 152, 0, 0.1);
+}
+
+.overview-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 20px;
+  margin-top: 25px;
+}
+
+.overview-card {
+  background: rgba(255, 255, 255, 0.9);
+  padding: 20px;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 152, 0, 0.1);
+  transition: all 0.3s ease;
+}
+
+.overview-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(255, 152, 0, 0.15);
+}
+
+.overview-card h3 {
+  color: var(--primary-orange);
+  margin: 0 0 10px 0;
+  font-size: 16px;
+}
+
+.overview-card p {
+  color: #666;
+  margin: 5px 0;
+  font-size: 14px;
+}
+
+/* Individual Page Containers */
+.profile-container,
+.insurance-container,
+.hours-container,
+.weather-container {
+  max-width: 100%;
+}
+
+.profile-container .card,
+.insurance-container .card,
+.hours-container .card,
+.weather-container .card {
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 15px;
+  padding: 30px;
+  border: 1px solid rgba(255, 152, 0, 0.1);
+  box-shadow: 0 5px 15px rgba(255, 152, 0, 0.1);
+  margin-bottom: 20px;
+}
+
+.profile-container .card h2,
+.insurance-container .card h2,
+.hours-container .card h2,
+.weather-container .card h2 {
+  color: var(--primary-orange);
+  margin-bottom: 25px;
+  font-size: 22px;
+  border-bottom: 2px solid var(--light-orange);
+  padding-bottom: 10px;
+}
+
+/* Profile Specific */
+.profile-field {
+  margin-bottom: 20px;
+}
+
+.profile-field label {
+  display: block;
+  color: var(--primary-orange);
+  font-weight: 600;
+  margin-bottom: 5px;
+}
+
+.profile-field p {
+  color: #333;
+  font-size: 16px;
+  margin: 0;
+}
+
+.user-id {
+  font-family: monospace;
+  background: rgba(255, 152, 0, 0.1);
+  padding: 5px 8px;
+  border-radius: 4px;
+  font-size: 14px;
+}
+
+.edit-profile-btn {
+  background: linear-gradient(135deg, var(--primary-orange), var(--orange-hover));
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  margin-top: 20px;
+  transition: all 0.3s ease;
+}
+
+.edit-profile-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(255, 152, 0, 0.3);
+}
+
+/* Insurance Specific */
+.insurance-overview {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 20px;
+  margin-bottom: 30px;
+}
+
+.overview-item {
+  background: rgba(255, 255, 255, 0.8);
+  padding: 20px;
+  border-radius: 10px;
+  text-align: center;
+  border: 1px solid rgba(255, 152, 0, 0.1);
+}
+
+.overview-item h3 {
+  color: #666;
+  font-size: 14px;
+  margin-bottom: 10px;
+  font-weight: 500;
+}
+
+.overview-item .amount {
+  color: var(--primary-orange);
+  font-size: 24px;
+  font-weight: 700;
+  margin: 0;
+}
+
+.claim-history {
+  margin-bottom: 30px;
+}
+
+.claim-history h3 {
+  color: var(--primary-orange);
+  margin-bottom: 15px;
+}
+
+.claims-list {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.claim-item {
+  background: rgba(255, 255, 255, 0.8);
+  padding: 15px;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 152, 0, 0.1);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.claim-details p {
+  margin: 5px 0;
+  font-size: 14px;
+}
+
+.claim-status {
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.claim-status.approved {
+  background: rgba(76, 175, 80, 0.1);
+  color: #4caf50;
+}
+
+.claim-status.processing {
+  background: rgba(255, 152, 0, 0.1);
+  color: #ff9800;
+}
+
+.insurance-actions {
+  display: flex;
+  gap: 15px;
+}
+
+.action-btn {
+  background: linear-gradient(135deg, var(--primary-orange), var(--orange-hover));
+  color: white;
+  border: none;
+  padding: 12px 20px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  flex: 1;
+}
+
+.action-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(255, 152, 0, 0.3);
+}
+
+.action-btn.primary {
+  background: linear-gradient(135deg, var(--orange-accent), var(--orange-hover));
+}
+
+/* Hours Specific */
+.hours-overview {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 20px;
+  margin-bottom: 30px;
+}
+
+.hours-overview .overview-item {
+  text-align: left;
+}
+
+.hours-overview .hours {
+  color: var(--primary-orange);
+  font-size: 28px;
+  font-weight: 700;
+  margin: 10px 0;
+}
+
+.progress-bar {
+  background: #e0e0e0;
+  height: 8px;
+  border-radius: 4px;
+  margin: 10px 0;
+  overflow: hidden;
+}
+
+.progress-fill {
+  background: linear-gradient(90deg, var(--primary-orange), var(--orange-hover));
+  height: 100%;
+  border-radius: 4px;
+  transition: width 0.3s ease;
+}
+
+.weekly-records {
+  margin-bottom: 30px;
+}
+
+.records-table {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.record-row {
+  background: rgba(255, 255, 255, 0.8);
+  padding: 12px;
+  border-radius: 6px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border: 1px solid rgba(255, 152, 0, 0.1);
+}
+
+.record-row .day {
+  font-weight: 600;
+  color: var(--primary-orange);
+}
+
+.record-row .date {
+  color: #666;
+  font-size: 14px;
+}
+
+.record-row .hours {
+  font-weight: 600;
+  color: #333;
+}
+
+.record-row .status {
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.status.good {
+  background: rgba(76, 175, 80, 0.1);
+  color: #4caf50;
+}
+
+.status.low {
+  background: rgba(255, 87, 34, 0.1);
+  color: var(--orange-accent);
+}
+
+/* Weather Specific */
+.location-info {
+  margin-bottom: 25px;
+}
+
+.location-info h3 {
+  color: var(--primary-orange);
+  margin-bottom: 10px;
+}
+
+.current-weather {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 30px;
+  margin-bottom: 25px;
+}
+
+.weather-main {
+  text-align: center;
+}
+
+.weather-main h3 {
+  color: var(--primary-orange);
+  font-size: 24px;
+  margin-bottom: 10px;
+}
+
+.temperature {
+  font-size: 48px;
+  font-weight: 700;
+  color: #333;
+  margin: 10px 0;
+}
+
+.description {
+  color: #666;
+  font-size: 16px;
+  text-transform: capitalize;
+}
+
+.weather-details {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.detail-item {
+  display: flex;
+  justify-content: space-between;
+  padding: 10px;
+  background: rgba(255, 255, 255, 0.8);
+  border-radius: 6px;
+  border: 1px solid rgba(255, 152, 0, 0.1);
+}
+
+.weather-alert {
+  background: rgba(255, 87, 34, 0.1);
+  color: var(--orange-accent);
+  padding: 20px;
+  border-radius: 10px;
+  border-left: 4px solid var(--orange-accent);
+  margin-bottom: 25px;
+}
+
+.weather-alert h3 {
+  margin-bottom: 10px;
+}
+
+.auto-claims-history {
+  margin-bottom: 30px;
+}
+
+.auto-claims-history h3 {
+  color: var(--primary-orange);
+  margin-bottom: 15px;
+}
+
+.weather-actions {
+  display: flex;
+  gap: 15px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .dashboard-layout {
+    flex-direction: column;
+  }
+  
+  .sidebar {
+    width: 100%;
+    border-right: none;
+    border-bottom: 1px solid rgba(255, 152, 0, 0.1);
+  }
+  
+  .sidebar-nav {
+    display: flex;
+    overflow-x: auto;
+    padding: 10px;
+  }
+  
+  .sidebar-nav ul {
+    display: flex;
+    gap: 10px;
+  }
+  
+  .sidebar-nav li {
+    margin: 0;
+  }
+  
+  .nav-btn {
+    white-space: nowrap;
+    min-width: 120px;
+  }
+  
+  .content-header {
+    flex-direction: column;
+    gap: 15px;
+    text-align: center;
+  }
+  
+  .current-weather {
+    grid-template-columns: 1fr;
+  }
+  
+  .insurance-overview,
+  .hours-overview {
+    grid-template-columns: 1fr;
+  }
+  
+  .insurance-actions,
+  .weather-actions {
+    flex-direction: column;
+  }
+}

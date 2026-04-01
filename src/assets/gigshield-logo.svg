@@ -1,0 +1,36 @@
+<svg width="80" height="80" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+  <!-- Shield Background -->
+  <path d="M50 10 L85 25 L85 60 Q85 85 50 95 Q15 85 15 60 L15 25 Z" 
+        fill="#FFE0B2" stroke="#FF9800" stroke-width="2"/>
+  
+  <!-- Person Figure -->
+  <g stroke="#333" stroke-width="2" fill="none">
+    <!-- Head -->
+    <circle cx="50" cy="35" r="6"/>
+    
+    <!-- Cap -->
+    <path d="M44 32 Q50 28 56 32 L56 35 Q50 33 44 35 Z" fill="#333"/>
+    
+    <!-- Body -->
+    <line x1="50" y1="41" x2="50" y2="55"/>
+    
+    <!-- Arms -->
+    <line x1="50" y1="45" x2="42" y2="50"/>
+    <line x1="50" y1="45" x2="58" y2="50"/>
+    
+    <!-- Smartphone in hand -->
+    <rect x="56" y="48" width="4" height="6" rx="0.5" fill="#333"/>
+    
+    <!-- Backpack -->
+    <path d="M46 43 L46 52 Q48 54 50 52 Q52 54 54 52 L54 43 Q50 41 46 43 Z" 
+          fill="#FFE0B2" stroke="#333" stroke-width="1.5"/>
+    
+    <!-- Legs -->
+    <line x1="50" y1="55" x2="45" y2="65"/>
+    <line x1="50" y1="55" x2="55" y2="65"/>
+  </g>
+  
+  <!-- GigShield Text -->
+  <text x="50" y="75" text-anchor="middle" font-family="Arial, sans-serif" 
+        font-size="8" font-weight="bold" fill="#FF9800">GigShield</text>
+</svg>
