@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { createUserWithEmailAndPassword, signInWithPopup } from "firebase/auth";
+import { createUserWithEmailAndPassword, signInWithRedirect } from "firebase/auth";
 import { auth, provider } from "../firebase";
 
 function Signup() {
@@ -49,89 +49,89 @@ function Signup() {
 
   const handleGoogle = async () => {
     try {
-      const result = await signInWithPopup(auth, provider);
-      
-      console.log("Google signup successful:", result.user);
-      
-      // For Google signup, we'll get basic info from Google
-      const user = result.user;
-      localStorage.setItem("userProfile", JSON.stringify({
-        name: user.displayName || "User",
-        phone: "",
-        location: "",
-        email: user.email
-      }));
-      
-      navigate("/insurance");
+      await signInWithRedirect(auth, provider);
     } catch (err) {
-      alert(err.message);
+      window.alert(err.message);
     }
   };
 
   return (
     <div className="auth-container">
-      <div className="card">
-        <div className="brand">
-          <img src="/src/assets/gigshield-logo.svg" alt="GigShield Logo" className="logo" />
-          <h2>Create Account - GigShield</h2>
+      <div className="card auth-shell">
+        <div className="auth-aside">
+          <div className="brand brand-left">
+            <img src="/src/assets/gigshield-logo.svg" alt="GigShield Logo" className="logo" />
+            <h2>New Partner Setup</h2>
+          </div>
+          <p className="auth-copy">Create your protected ops profile in under 2 minutes.</p>
+          <ol className="step-list">
+            <li>Complete account details</li>
+            <li>Activate weekly protection plan</li>
+            <li>Start live delivery safety monitoring</li>
+          </ol>
         </div>
 
-        <form onSubmit={handleSubmit}>
-          <input
-            type="text"
-            placeholder="Full Name"
-            onChange={(e) =>
-              setForm({ ...form, name: e.target.value })
-            }
-            required
-          />
+        <div className="auth-form-panel">
+          <h3>Create your account</h3>
+          <p className="form-subtext">Used by delivery partners and fleet operators for real-time coverage.</p>
 
-          <input
-            type="tel"
-            placeholder="Phone Number"
-            onChange={(e) =>
-              setForm({ ...form, phone: e.target.value })
-            }
-            required
-          />
+          <form onSubmit={handleSubmit}>
+            <input
+              type="text"
+              placeholder="Full Name"
+              onChange={(e) =>
+                setForm({ ...form, name: e.target.value })
+              }
+              required
+            />
 
-          <input
-            type="text"
-            placeholder="City/Location"
-            onChange={(e) =>
-              setForm({ ...form, location: e.target.value })
-            }
-            required
-          />
+            <input
+              type="tel"
+              placeholder="Phone Number"
+              onChange={(e) =>
+                setForm({ ...form, phone: e.target.value })
+              }
+              required
+            />
 
-          <input
-            type="email"
-            placeholder="Email"
-            onChange={(e) =>
-              setForm({ ...form, email: e.target.value })
-            }
-            required
-          />
+            <input
+              type="text"
+              placeholder="City/Location"
+              onChange={(e) =>
+                setForm({ ...form, location: e.target.value })
+              }
+              required
+            />
 
-          <input
-            type="password"
-            placeholder="Password"
-            onChange={(e) =>
-              setForm({ ...form, password: e.target.value })
-            }
-            required
-          />
+            <input
+              type="email"
+              placeholder="Email"
+              onChange={(e) =>
+                setForm({ ...form, email: e.target.value })
+              }
+              required
+            />
 
-          <button type="submit">Sign Up</button>
-        </form>
+            <input
+              type="password"
+              placeholder="Password"
+              onChange={(e) =>
+                setForm({ ...form, password: e.target.value })
+              }
+              required
+            />
 
-        <button onClick={handleGoogle} className="google-btn">
-          Continue with Google
-        </button>
+            <button type="submit">Sign Up</button>
+          </form>
 
-        <p onClick={() => navigate("/")}>
-          Already have an account? Login
-        </p>
+          <button onClick={handleGoogle} className="google-btn">
+            Continue with Google
+          </button>
+
+          <p onClick={() => navigate("/")}>
+            Already have an account? Login
+          </p>
+        </div>
       </div>
     </div>
   );

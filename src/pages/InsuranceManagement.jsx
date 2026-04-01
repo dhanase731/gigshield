@@ -1,28 +1,22 @@
-import { useEffect, useState } from "react";
+import { useMemo } from "react";
 
 function InsuranceManagement() {
-  const [weeklyContribution, setWeeklyContribution] = useState(0);
-  const [totalClaims, setTotalClaims] = useState(0);
-  const [claimHistory, setClaimHistory] = useState([]);
-
-  useEffect(() => {
+  const weeklyContribution = useMemo(() => {
     const contribution = localStorage.getItem("weeklyPay");
-    if (contribution) {
-      setWeeklyContribution(parseFloat(contribution));
-    }
+    return contribution ? parseFloat(contribution) : 0;
+  }, []);
 
-    // Simulate claim history
-    setClaimHistory([
+  const claimHistory = useMemo(() => {
+    return [
       { id: 1, date: "2024-03-15", reason: "Heavy Rain", amount: 5000, status: "Approved" },
       { id: 2, date: "2024-02-28", reason: "Thunderstorm", amount: 3000, status: "Processing" }
-    ]);
-    setTotalClaims(2);
+    ];
   }, []);
 
   return (
     <div className="insurance-container">
       <div className="card">
-        <h2>🛡️ Insurance Management</h2>
+        <h2>Insurance Management</h2>
         
         <div className="insurance-overview">
           <div className="overview-item">

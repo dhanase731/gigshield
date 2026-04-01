@@ -1,6 +1,6 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { signInWithEmailAndPassword, signInWithPopup } from "firebase/auth";
+import { getRedirectResult, signInWithEmailAndPassword, signInWithRedirect } from "firebase/auth";
 import { auth, provider } from "../firebase";
 import "../styles/auth.css";
 
@@ -10,9 +10,42 @@ function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
+  useEffect(() => {
+    const processRedirectResult = async () => {
+      try {
+        const result = await getRedirectResult(auth);
+        if (!result?.user) {
+          return;
+        }
+
+        const existingProfile = localStorage.getItem("userProfile");
+        if (!existingProfile) {
+          localStorage.setItem("userProfile", JSON.stringify({
+            name: result.user.displayName || "User",
+            phone: "",
+            location: "",
+            email: result.user.email,
+            uid: result.user.uid
+          }));
+        }
+
+        const weeklyPay = localStorage.getItem("weeklyPay");
+        if (weeklyPay) {
+          navigate("/dashboard");
+        } else {
+          navigate("/insurance");
+        }
+      } catch (err) {
+        window.alert(err.message);
+      }
+    };
+
+    processRedirectResult();
+  }, [navigate]);
+
   const handleLogin = async () => {
     try {
-      const result = await signInWithEmailAndPassword(auth, email, password);
+      await signInWithEmailAndPassword(auth, email, password);
       
       // Check if user has completed insurance setup
       const weeklyPay = localStorage.getItem("weeklyPay");
@@ -28,60 +61,53 @@ function Login() {
 
   const handleGoogle = async () => {
     try {
-      const result = await signInWithPopup(auth, provider);
-      
-      // Store user profile from Google if not exists
-      const existingProfile = localStorage.getItem("userProfile");
-      if (!existingProfile) {
-        localStorage.setItem("userProfile", JSON.stringify({
-          name: result.user.displayName || "User",
-          phone: "",
-          location: "",
-          email: result.user.email,
-          uid: result.user.uid
-        }));
-      }
-      
-      // Check if user has completed insurance setup
-      const weeklyPay = localStorage.getItem("weeklyPay");
-      if (weeklyPay) {
-        navigate("/dashboard");
-      } else {
-        navigate("/insurance");
-      }
+      await signInWithRedirect(auth, provider);
     } catch (err) {
-      alert(err.message);
+      window.alert(err.message);
     }
   };
 
   return (
     <div className="auth-container">
-      <div className="card">
-        <div className="brand">
-          <img src="/src/assets/gigshield-logo.svg" alt="GigShield Logo" className="logo" />
-          <h2>Welcome to GigShield</h2>
+      <div className="card auth-shell">
+        <div className="auth-aside">
+          <div className="brand brand-left">
+            <img src="/src/assets/gigshield-logo.svg" alt="GigShield Logo" className="logo" />
+            <h2>GigShield Access</h2>
+          </div>
+          <p className="auth-copy">Insurance-grade protection for everyday delivery operations.</p>
+          <ul className="feature-list">
+            <li>Instant risk alerts for severe weather</li>
+            <li>Auto-claims workflow for downtime events</li>
+            <li>Order safety controls from one dashboard</li>
+          </ul>
         </div>
 
-        <input
-          placeholder="Email"
-          onChange={(e) => setEmail(e.target.value)}
-        />
+        <div className="auth-form-panel">
+          <h3>Sign in to continue</h3>
+          <p className="form-subtext">Track deliveries, monitor risk, and keep every shift protected.</p>
 
-        <input
-          type="password"
-          placeholder="Password"
-          onChange={(e) => setPassword(e.target.value)}
-        />
+          <input
+            placeholder="Email"
+            onChange={(e) => setEmail(e.target.value)}
+          />
 
-        <button onClick={handleLogin}>Login</button>
+          <input
+            type="password"
+            placeholder="Password"
+            onChange={(e) => setPassword(e.target.value)}
+          />
 
-        <button onClick={handleGoogle} className="google-btn">
-          Continue with Google
-        </button>
+          <button onClick={handleLogin}>Login</button>
 
-        <p onClick={() => navigate("/signup")}>
-          Don't have an account? Sign Up
-        </p>
+          <button onClick={handleGoogle} className="google-btn">
+            Continue with Google
+          </button>
+
+          <p onClick={() => navigate("/signup")}>
+            Don't have an account? Sign Up
+          </p>
+        </div>
       </div>
     </div>
   );

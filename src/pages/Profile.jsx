@@ -1,19 +1,15 @@
-import { useEffect, useState } from "react";
+import { useMemo } from "react";
 
 function Profile() {
-  const [userProfile, setUserProfile] = useState(null);
-
-  useEffect(() => {
+  const userProfile = useMemo(() => {
     const profile = localStorage.getItem("userProfile");
-    if (profile) {
-      setUserProfile(JSON.parse(profile));
-    }
+    return profile ? JSON.parse(profile) : null;
   }, []);
 
   return (
     <div className="profile-container">
       <div className="card">
-        <h2>👤 User Profile</h2>
+        <h2>User Profile</h2>
         {userProfile ? (
           <div className="profile-info">
             <div className="profile-field">

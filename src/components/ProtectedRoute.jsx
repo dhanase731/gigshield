@@ -8,7 +8,6 @@ function ProtectedRoute({ children }) {
   useEffect(() => {
     const checkAuth = () => {
       const userProfile = localStorage.getItem("userProfile");
-      const weeklyPay = localStorage.getItem("weeklyPay");
       
       if (!userProfile) {
         navigate("/");

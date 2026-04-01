@@ -11,7 +11,7 @@ body {
   background: linear-gradient(to right, var(--light-orange), var(--orange-light-bg));
 }
 
-.card {
+.auth-container .card {
   background: rgba(255, 255, 255, 0.95);
   backdrop-filter: blur(10px);
   padding: 40px;
@@ -24,19 +24,19 @@ body {
   transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
-.card:hover {
+.auth-container .card:hover {
   transform: translateY(-5px);
   box-shadow: 0 20px 45px rgba(255, 152, 0, 0.3);
 }
 
-.card h2 {
+.auth-container .card h2 {
   margin-bottom: 25px;
   color: var(--primary-orange);
   font-size: 28px;
   font-weight: 600;
 }
 
-.card input, .card select {
+.auth-container .card input, .auth-container .card select {
   width: 100%;
   padding: 15px;
   margin: 12px 0;
@@ -48,13 +48,13 @@ body {
   box-sizing: border-box;
 }
 
-.card input:focus, .card select:focus {
+.auth-container .card input:focus, .auth-container .card select:focus {
   outline: none;
   border-color: var(--primary-orange);
   box-shadow: 0 0 0 3px rgba(255, 152, 0, 0.1);
 }
 
-.card button {
+.auth-container .card button {
   width: 100%;
   padding: 15px;
   background: linear-gradient(135deg, var(--primary-orange), var(--orange-hover));
@@ -69,12 +69,12 @@ body {
   box-shadow: 0 4px 15px rgba(255, 152, 0, 0.3);
 }
 
-.card button:hover {
+.auth-container .card button:hover {
   transform: translateY(-2px);
   box-shadow: 0 8px 25px rgba(255, 152, 0, 0.4);
 }
 
-.card button:active {
+.auth-container .card button:active {
   transform: translateY(0);
 }
 
@@ -146,7 +146,7 @@ body {
   margin: 0;
 }
 
-.card p {
+.auth-container .card p {
   margin-top: 20px;
   color: var(--primary-orange);
   cursor: pointer;
@@ -155,13 +155,101 @@ body {
   text-decoration: none;
 }
 
-.card p:hover {
+.auth-container .card p:hover {
   color: var(--orange-hover);
   text-decoration: underline;
 }
 
+.auth-shell {
+  max-width: 920px;
+  display: grid;
+  grid-template-columns: 1fr 1.2fr;
+  gap: 28px;
+  text-align: left;
+}
+
+.auth-aside {
+  background: linear-gradient(180deg, rgba(255, 243, 224, 0.85), rgba(255, 224, 178, 0.6));
+  border: 1px solid rgba(255, 152, 0, 0.15);
+  border-radius: 16px;
+  padding: 22px;
+}
+
+.brand-left {
+  justify-content: flex-start;
+  margin-bottom: 14px;
+}
+
+.auth-copy {
+  color: #555;
+  line-height: 1.5;
+  margin-bottom: 16px;
+}
+
+.feature-list,
+.step-list {
+  margin: 0;
+  padding-left: 18px;
+  color: #555;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.auth-form-panel {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.auth-form-panel h3 {
+  color: var(--primary-orange);
+  font-size: 24px;
+  margin-bottom: 8px;
+}
+
+.form-subtext {
+  color: #666;
+  margin-bottom: 18px;
+  line-height: 1.5;
+}
+
+.auth-form-panel form {
+  display: flex;
+  flex-direction: column;
+}
+
+.insurance-shell .auth-form-panel {
+  gap: 8px;
+}
+
+.plan-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.plan-chip {
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid rgba(255, 152, 0, 0.3);
+  color: var(--primary-orange);
+  padding: 10px 14px;
+  border-radius: 10px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.plan-chip.selected,
+.plan-chip:hover {
+  background: linear-gradient(135deg, var(--primary-orange), var(--orange-hover));
+  color: #fff;
+  border-color: transparent;
+}
+
 @media (max-width: 480px) {
-  .card {
+  .auth-container .card {
     padding: 30px 25px;
     margin: 10px;
   }
@@ -169,5 +257,16 @@ body {
   .brand img {
     width: 40px;
     height: 40px;
+  }
+}
+
+@media (max-width: 900px) {
+  .auth-shell {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  .auth-aside {
+    padding: 16px;
   }
 }
