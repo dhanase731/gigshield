@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
 import Profile from "./Profile";
 import InsuranceManagement from "./InsuranceManagement";
 import DrivingHours from "./DrivingHours";
@@ -8,12 +9,13 @@ import WeatherMonitor from "./WeatherMonitor";
 function Dashboard() {
   const navigate = useNavigate();
   const [activeSection, setActiveSection] = useState("overview");
-  const [serviceStatus] = useState("Operational");
+  const [serviceStatus, setServiceStatus] = useState("Checking...");
+  const [lastSync, setLastSync] = useState("Checking...");
   const userProfile = useMemo(() => {
     const profile = localStorage.getItem("userProfile");
     return profile ? JSON.parse(profile) : null;
   }, []);
-  const weeklyPay = localStorage.getItem("weeklyPay") || "0";
+  const [weeklyPay, setWeeklyPay] = useState(localStorage.getItem("weeklyPay") || "0");
 
   const todayOrders = useMemo(
     () => [
@@ -38,6 +40,41 @@ function Dashboard() {
       navigate("/");
     }
   }, [navigate, userProfile]);
+
+  useEffect(() => {
+    let mounted = true;
+
+    const checkServiceStatus = async () => {
+      try {
+        const [healthResponse, summaryResponse] = await Promise.all([
+          axios.get("/api/health"),
+          axios.get(`/api/dashboard-summary${userProfile?.uid ? `?uid=${userProfile.uid}` : ""}`),
+        ]);
+
+        const healthData = healthResponse.data;
+        const summaryData = summaryResponse.data;
+        if (!mounted) return;
+
+        const reportedAt = new Date(healthData.timestamp || Date.now());
+        setServiceStatus(healthData.status || "Operational");
+        if (typeof summaryData.weeklyPay === "number") {
+          setWeeklyPay(String(summaryData.weeklyPay));
+          localStorage.setItem("weeklyPay", String(summaryData.weeklyPay));
+        }
+        setLastSync(reportedAt.toLocaleString());
+      } catch {
+        if (!mounted) return;
+        setServiceStatus("API Offline");
+        setLastSync("Unavailable");
+      }
+    };
+
+    checkServiceStatus();
+
+    return () => {
+      mounted = false;
+    };
+  }, [userProfile?.uid]);
 
   const handleLogout = () => {
     localStorage.removeItem("userProfile");
@@ -85,7 +122,7 @@ function Dashboard() {
                 <div className="kpi-card">
                   <p className="kpi-label">Risk Engine</p>
                   <h3>Live</h3>
-                  <span>Auto-cancel + safety alerts enabled</span>
+                  <span>Safety alerts enabled; order cancellation is user-controlled</span>
                 </div>
                 <div className="kpi-card">
                   <p className="kpi-label">Claims Readiness</p>
@@ -228,7 +265,7 @@ function Dashboard() {
               {activeSection === "weather" && "Weather Monitor"}
             </h1>
             <div className="header-actions">
-              <span className="last-sync">Last sync: Just now</span>
+              <span className="last-sync">Last sync: {lastSync}</span>
             </div>
           </header>
           

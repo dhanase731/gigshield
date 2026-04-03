@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
 
 function InsuranceSetup() {
   const [amount, setAmount] = useState("");
@@ -47,13 +48,31 @@ function InsuranceSetup() {
           />
 
           <button
-            onClick={() => {
+            onClick={async () => {
               if (!amount) {
                 window.alert("Please select or enter a weekly amount.");
                 return;
               }
-              localStorage.setItem("weeklyPay", amount);
-              navigate("/dashboard");
+
+              const userProfileRaw = localStorage.getItem("userProfile");
+              const userProfile = userProfileRaw ? JSON.parse(userProfileRaw) : null;
+
+              if (!userProfile?.uid) {
+                window.alert("Please login again to continue.");
+                navigate("/");
+                return;
+              }
+
+              try {
+                const { data } = await axios.put(`/api/users/${userProfile.uid}/insurance`, {
+                  weeklyPay: Number(amount),
+                });
+
+                localStorage.setItem("weeklyPay", String(data.weeklyPay || Number(amount)));
+                navigate("/dashboard");
+              } catch {
+                window.alert("Unable to save insurance plan. Please try again.");
+              }
             }}
           >
             Activate Protection

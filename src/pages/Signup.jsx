@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
 import { createUserWithEmailAndPassword, signInWithRedirect } from "firebase/auth";
 import { auth, provider } from "../firebase";
 
@@ -28,13 +29,17 @@ function Signup() {
       console.log("Firebase signup successful:", result.user);
       
       // Store user profile data
-      localStorage.setItem("userProfile", JSON.stringify({
+      const profilePayload = {
         name: form.name,
         phone: form.phone,
         location: form.location,
         email: form.email,
         uid: result.user.uid
-      }));
+      };
+
+      localStorage.setItem("userProfile", JSON.stringify(profilePayload));
+
+      await axios.put(`/api/users/${result.user.uid}/profile`, profilePayload);
       
       console.log("Profile saved to localStorage");
       alert("Account created successfully!");

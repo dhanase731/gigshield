@@ -1,9 +1,32 @@
-import { useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
+import axios from "axios";
 
 function InsuranceManagement() {
-  const weeklyContribution = useMemo(() => {
+  const [weeklyContribution, setWeeklyContribution] = useState(() => {
     const contribution = localStorage.getItem("weeklyPay");
     return contribution ? parseFloat(contribution) : 0;
+  });
+
+  useEffect(() => {
+    const loadInsurance = async () => {
+      const userProfileRaw = localStorage.getItem("userProfile");
+      const userProfile = userProfileRaw ? JSON.parse(userProfileRaw) : null;
+
+      if (!userProfile?.uid) {
+        return;
+      }
+
+      try {
+        const { data } = await axios.get(`/api/users/${userProfile.uid}/insurance`);
+        const amount = Number(data?.weeklyPay || 0);
+        setWeeklyContribution(amount);
+        localStorage.setItem("weeklyPay", String(amount));
+      } catch {
+        // Ignore and keep local fallback value
+      }
+    };
+
+    loadInsurance();
   }, []);
 
   const claimHistory = useMemo(() => {

@@ -161,11 +161,17 @@ body {
 }
 
 .auth-shell {
+  width: 100%;
   max-width: 920px;
   display: grid;
   grid-template-columns: 1fr 1.2fr;
   gap: 28px;
   text-align: left;
+}
+
+.auth-container .card.auth-shell {
+  max-width: 920px;
+  padding: 32px;
 }
 
 .auth-aside {
@@ -261,6 +267,10 @@ body {
 }
 
 @media (max-width: 900px) {
+  .auth-container .card.auth-shell {
+    padding: 26px;
+  }
+
   .auth-shell {
     grid-template-columns: 1fr;
     gap: 16px;

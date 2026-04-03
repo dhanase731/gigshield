@@ -1,5 +1,6 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
 import { getRedirectResult, signInWithEmailAndPassword, signInWithRedirect } from "firebase/auth";
 import { auth, provider } from "../firebase";
 import "../styles/auth.css";
@@ -10,6 +11,44 @@ function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
+  const syncProfileFromApi = useCallback(async (user) => {
+    try {
+      const { data } = await axios.get(`/api/users/${user.uid}/profile`);
+      localStorage.setItem("userProfile", JSON.stringify(data));
+      return data;
+    } catch {
+      const fallbackProfile = {
+        name: user.displayName || "User",
+        phone: "",
+        location: "",
+        email: user.email,
+        uid: user.uid,
+      };
+
+      await axios.put(`/api/users/${user.uid}/profile`, fallbackProfile);
+      localStorage.setItem("userProfile", JSON.stringify(fallbackProfile));
+      return fallbackProfile;
+    }
+  }, []);
+
+  const routeAfterAuth = useCallback(async (uid) => {
+    try {
+      const { data } = await axios.get(`/api/users/${uid}/insurance`);
+      const weeklyPay = data?.weeklyPay || 0;
+
+      if (weeklyPay > 0) {
+        localStorage.setItem("weeklyPay", String(weeklyPay));
+        navigate("/dashboard");
+      } else {
+        localStorage.removeItem("weeklyPay");
+        navigate("/insurance");
+      }
+    } catch {
+      localStorage.removeItem("weeklyPay");
+      navigate("/insurance");
+    }
+  }, [navigate]);
+
   useEffect(() => {
     const processRedirectResult = async () => {
       try {
@@ -18,42 +57,21 @@ function Login() {
           return;
         }
 
-        const existingProfile = localStorage.getItem("userProfile");
-        if (!existingProfile) {
-          localStorage.setItem("userProfile", JSON.stringify({
-            name: result.user.displayName || "User",
-            phone: "",
-            location: "",
-            email: result.user.email,
-            uid: result.user.uid
-          }));
-        }
-
-        const weeklyPay = localStorage.getItem("weeklyPay");
-        if (weeklyPay) {
-          navigate("/dashboard");
-        } else {
-          navigate("/insurance");
-        }
+        await syncProfileFromApi(result.user);
+        await routeAfterAuth(result.user.uid);
       } catch (err) {
         window.alert(err.message);
       }
     };
 
     processRedirectResult();
-  }, [navigate]);
+  }, [navigate, routeAfterAuth, syncProfileFromApi]);
 
   const handleLogin = async () => {
     try {
-      await signInWithEmailAndPassword(auth, email, password);
-      
-      // Check if user has completed insurance setup
-      const weeklyPay = localStorage.getItem("weeklyPay");
-      if (weeklyPay) {
-        navigate("/dashboard");
-      } else {
-        navigate("/insurance");
-      }
+      const credential = await signInWithEmailAndPassword(auth, email, password);
+      await syncProfileFromApi(credential.user);
+      await routeAfterAuth(credential.user.uid);
     } catch (err) {
       alert(err.message);
     }

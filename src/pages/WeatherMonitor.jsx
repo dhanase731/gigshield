@@ -6,6 +6,7 @@ const DEFAULT_RISK_CONFIG = {
   rainVolumeThreshold: 20,
   earthquakeMagnitudeThreshold: 4.5,
   treatRainAsEmergency: true,
+  autoCancelOrders: false,
 };
 
 const DEFAULT_ORDERS = [
@@ -21,6 +22,7 @@ function WeatherMonitor() {
   const [userLocation, setUserLocation] = useState(null);
   const [coordinates, setCoordinates] = useState(null);
   const [claims, setClaims] = useState(() => JSON.parse(localStorage.getItem("autoClaims") || "[]"));
+  const [selectedOrderIds, setSelectedOrderIds] = useState([]);
   const [orders, setOrders] = useState(() => {
     const existing = localStorage.getItem("activeOrders");
     if (existing) {
@@ -35,7 +37,10 @@ function WeatherMonitor() {
   const [riskConfig, setRiskConfig] = useState(() => {
     const existing = localStorage.getItem("riskConfig");
     if (existing) {
-      return JSON.parse(existing);
+      return {
+        ...DEFAULT_RISK_CONFIG,
+        ...JSON.parse(existing),
+      };
     }
     return DEFAULT_RISK_CONFIG;
   });
@@ -78,8 +83,9 @@ function WeatherMonitor() {
     }
 
     lastAlertSignatureRef.current = signature;
+    const orderAction = riskConfig.autoCancelOrders ? "Orders will be cancelled." : "Orders will stay active until you choose to cancel them.";
     window.alert(
-      `DISPATCH ALERT: ${risk.event} at ${locationLabel}.\nAction: Orders cancelled. Move to safe zone now.\nSource: ${risk.source}.`
+      `DISPATCH ALERT: ${risk.event} at ${locationLabel}.\nAction: ${orderAction} Move to safe zone now.\nSource: ${risk.source}.`
     );
   };
 
@@ -138,6 +144,48 @@ function WeatherMonitor() {
     );
   };
 
+  const toggleOrderSelection = (orderId) => {
+    setSelectedOrderIds((prevSelected) =>
+      prevSelected.includes(orderId)
+        ? prevSelected.filter((id) => id !== orderId)
+        : [...prevSelected, orderId]
+    );
+  };
+
+  const cancelSelectedOrders = () => {
+    if (selectedOrderIds.length === 0) {
+      window.alert("Select at least one active order to cancel.");
+      return;
+    }
+
+    const reason = `Cancelled manually by user on ${new Date().toLocaleString()}`;
+
+    setOrders((prevOrders) => {
+      const updated = prevOrders.map((order) => {
+        if (!selectedOrderIds.includes(order.id) || order.status !== "Active") {
+          return order;
+        }
+
+        return {
+          ...order,
+          status: "Cancelled",
+          cancellationReason: reason,
+          cancelledAt: new Date().toISOString(),
+        };
+      });
+
+      localStorage.setItem("activeOrders", JSON.stringify(updated));
+      return updated;
+    });
+
+    setSelectedOrderIds([]);
+
+    triggerBrowserNotification(
+      "Orders Cancelled Manually",
+      "The selected active orders were cancelled by the user."
+    );
+  };
+
   const triggerSimulatedEmergency = (eventType) => {
     const locationLabel = userLocation || "Simulated Zone";
     const simulatedWeatherData = weather || {
@@ -163,7 +211,10 @@ function WeatherMonitor() {
 
     setWeather(simulatedWeatherData);
     setLastUpdated(new Date().toISOString());
-    cancelAllActiveOrders(simulatedRisk.summary);
+
+    if (riskConfig.autoCancelOrders) {
+      cancelAllActiveOrders(simulatedRisk.summary);
+    }
 
     const newClaim = {
       id: crypto.randomUUID(),
@@ -182,8 +233,10 @@ function WeatherMonitor() {
     });
 
     triggerBrowserNotification(
-      "Simulation Alert: Orders Cancelled",
-      `${eventType} simulation triggered. Active orders were cancelled for safety drill.`
+      riskConfig.autoCancelOrders ? "Simulation Alert: Orders Cancelled" : "Simulation Alert: Review Orders",
+      riskConfig.autoCancelOrders
+        ? `${eventType} simulation triggered. Active orders were cancelled for safety drill.`
+        : `${eventType} simulation triggered. Orders were not cancelled automatically.`
     );
   };
 
@@ -247,12 +300,16 @@ function WeatherMonitor() {
 
       triggerAlertBox(risk, locationLabel);
 
-      cancelAllActiveOrders(risk.summary);
+      if (riskConfig.autoCancelOrders) {
+        cancelAllActiveOrders(risk.summary);
+      }
 
       handleAutoClaim(risk.event, weatherData, locationLabel);
       triggerBrowserNotification(
-        "Emergency Alert: Orders Cancelled",
-        `${risk.summary} All active orders were cancelled. Stay in a safe zone.`
+        riskConfig.autoCancelOrders ? "Emergency Alert: Orders Cancelled" : "Emergency Alert: Orders Need Review",
+        riskConfig.autoCancelOrders
+          ? `${risk.summary} All active orders were cancelled. Stay in a safe zone.`
+          : `${risk.summary} Orders were not cancelled automatically. Review them manually.`
       );
     };
 
@@ -478,6 +535,15 @@ function WeatherMonitor() {
               />
               Treat rain as emergency condition
             </label>
+
+            <label className="checkbox-row">
+              <input
+                type="checkbox"
+                checked={riskConfig.autoCancelOrders}
+                onChange={(e) => handleRiskConfigChange("autoCancelOrders", e.target.checked)}
+              />
+              Automatically cancel active orders during emergencies
+            </label>
           </div>
         </div>
         
@@ -517,7 +583,12 @@ function WeatherMonitor() {
                 <p><strong>Source:</strong> {alert.source}</p>
                 <p><strong>Event:</strong> {alert.event}</p>
                 <p><strong>Summary:</strong> {alert.summary}</p>
-                <p><strong>Orders:</strong> All active orders have been cancelled.</p>
+                <p>
+                  <strong>Orders:</strong>{" "}
+                  {riskConfig.autoCancelOrders
+                    ? "All active orders have been cancelled."
+                    : "Automatic cancellation is off. Review active orders manually."}
+                </p>
                 <p><strong>Claim amount:</strong> ₹{calculateClaimAmount(alert.event)}</p>
                 <div className="safety-advice">
                   <h4>Safety Advice</h4>
@@ -550,6 +621,9 @@ function WeatherMonitor() {
           <h3>Order Operations</h3>
           <p>Active orders: {activeOrdersCount}</p>
           <p>Cancelled orders: {cancelledOrdersCount}</p>
+          <p className="form-subtext">
+            Tick the orders you want to cancel, then use the button below.
+          </p>
           <button
             className="action-btn"
             onClick={restoreCancelledOrders}
@@ -557,9 +631,25 @@ function WeatherMonitor() {
           >
             Restore Cancelled Orders
           </button>
+          <button
+            className="action-btn primary"
+            onClick={cancelSelectedOrders}
+            disabled={selectedOrderIds.length === 0}
+          >
+            Cancel Selected Orders
+          </button>
           <div className="claims-list">
             {orders.map((order) => (
               <div key={order.id} className="claim-item">
+                <label className="checkbox-row order-select-row">
+                  <input
+                    type="checkbox"
+                    checked={selectedOrderIds.includes(order.id)}
+                    disabled={order.status !== "Active"}
+                    onChange={() => toggleOrderSelection(order.id)}
+                  />
+                  <span>{order.status === "Active" ? "Select" : "Not selectable"}</span>
+                </label>
                 <div className="claim-details">
                   <p><strong>Order:</strong> {order.id}</p>
                   <p><strong>Customer:</strong> {order.customer}</p>
