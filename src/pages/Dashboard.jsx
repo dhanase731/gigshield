@@ -11,29 +11,13 @@ function Dashboard() {
   const [activeSection, setActiveSection] = useState("overview");
   const [serviceStatus, setServiceStatus] = useState("Checking...");
   const [lastSync, setLastSync] = useState("Checking...");
+  const [todayOrders, setTodayOrders] = useState([]);
+  const [claimsTimeline, setClaimsTimeline] = useState([]);
   const userProfile = useMemo(() => {
     const profile = localStorage.getItem("userProfile");
     return profile ? JSON.parse(profile) : null;
   }, []);
   const [weeklyPay, setWeeklyPay] = useState(localStorage.getItem("weeklyPay") || "0");
-
-  const todayOrders = useMemo(
-    () => [
-      { id: "DEL-4812", zone: "Downtown", eta: "18 min", value: 240, risk: "Low" },
-      { id: "DEL-4818", zone: "West Side", eta: "24 min", value: 320, risk: "Medium" },
-      { id: "DEL-4821", zone: "Riverside", eta: "31 min", value: 180, risk: "High" },
-    ],
-    []
-  );
-
-  const claimsTimeline = useMemo(
-    () => [
-      { label: "Policy verified", time: "Today, 09:15", state: "done" },
-      { label: "Weather sync complete", time: "Today, 10:05", state: "done" },
-      { label: "Claim watch active", time: "Live", state: "live" },
-    ],
-    []
-  );
 
   useEffect(() => {
     if (!userProfile) {
@@ -57,6 +41,22 @@ function Dashboard() {
 
         const reportedAt = new Date(healthData.timestamp || Date.now());
         setServiceStatus(healthData.status || "Operational");
+        setTodayOrders(
+          (summaryData.recentOrders || []).map((order) => ({
+            id: order.orderId,
+            zone: order.zone,
+            eta: order.eta,
+            value: order.value,
+            risk: order.risk,
+          }))
+        );
+        setClaimsTimeline(
+          (summaryData.recentClaims || []).map((claim) => ({
+            label: claim.claimId,
+            time: `${claim.date} · ${claim.status}`,
+            state: claim.status === "Approved" ? "done" : "live",
+          }))
+        );
         if (typeof summaryData.weeklyPay === "number") {
           setWeeklyPay(String(summaryData.weeklyPay));
           localStorage.setItem("weeklyPay", String(summaryData.weeklyPay));
@@ -181,6 +181,7 @@ function Dashboard() {
                 <button className="action-btn" onClick={() => setActiveSection("hours")}>Track driving hours</button>
                 <button className="action-btn" onClick={() => setActiveSection("profile")}>Update profile</button>
                 <button className="action-btn" onClick={() => setActiveSection("weather")}>Run emergency drill</button>
+                <button className="action-btn" onClick={() => navigate("/admin")}>Open admin console</button>
               </div>
             </div>
           </div>

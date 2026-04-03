@@ -23,6 +23,33 @@ const userSchema = new mongoose.Schema(
 
 const UserProfile = mongoose.models.UserProfile || mongoose.model("UserProfile", userSchema);
 
+const orderSchema = new mongoose.Schema(
+  {
+    orderId: { type: String, required: true, unique: true, index: true, trim: true },
+    zone: { type: String, required: true, trim: true },
+    eta: { type: String, required: true, trim: true },
+    value: { type: Number, required: true, min: 0 },
+    risk: { type: String, required: true, enum: ["Low", "Medium", "High"] },
+    userUid: { type: String, default: "", trim: true },
+  },
+  { timestamps: true }
+);
+
+const claimSchema = new mongoose.Schema(
+  {
+    claimId: { type: String, required: true, unique: true, index: true, trim: true },
+    date: { type: String, required: true, trim: true },
+    reason: { type: String, required: true, trim: true },
+    amount: { type: Number, required: true, min: 0 },
+    status: { type: String, required: true, enum: ["Pending", "Approved", "Processing", "Rejected"] },
+    userUid: { type: String, default: "", trim: true },
+  },
+  { timestamps: true }
+);
+
+const Order = mongoose.models.Order || mongoose.model("Order", orderSchema);
+const Claim = mongoose.models.Claim || mongoose.model("Claim", claimSchema);
+
 app.use(cors());
 app.use(express.json());
 
@@ -131,19 +158,117 @@ app.put("/api/users/:uid/insurance", async (req, res) => {
 app.get("/api/dashboard-summary", async (req, res) => {
   try {
     const { uid } = req.query;
-    const userData = uid ? await UserProfile.findOne({ uid }).lean() : null;
+    const [userData, orderCount, claimCount, recentOrders, recentClaims] = await Promise.all([
+      uid ? UserProfile.findOne({ uid }).lean() : Promise.resolve(null),
+      Order.countDocuments(uid ? { userUid: uid } : {}),
+      Claim.countDocuments(uid ? { userUid: uid } : {}),
+      Order.find(uid ? { userUid: uid } : {})
+        .sort({ createdAt: -1 })
+        .limit(3)
+        .lean(),
+      Claim.find(uid ? { userUid: uid } : {})
+        .sort({ createdAt: -1 })
+        .limit(3)
+        .lean(),
+    ]);
 
     return res.json({
-      protectedDrivers: 128,
-      activePolicies: 124,
-      openClaims: 3,
-      weatherAlerts: 1,
+      protectedDrivers: orderCount,
+      activePolicies: orderCount,
+      openClaims: claimCount,
+      weatherAlerts: claimCount > 0 ? 1 : 0,
       weeklyPay: userData?.weeklyPay || 0,
       userName: userData?.name || null,
+      recentOrders,
+      recentClaims,
       timestamp: new Date().toISOString(),
     });
   } catch (error) {
     return res.status(500).json({ message: "Failed to fetch dashboard summary", error: error.message });
+  }
+});
+
+app.get("/api/orders", async (req, res) => {
+  try {
+    const { uid } = req.query;
+    const orders = await Order.find(uid ? { userUid: uid } : {})
+      .sort({ createdAt: -1 })
+      .lean();
+
+    return res.json(orders);
+  } catch (error) {
+    return res.status(500).json({ message: "Failed to fetch orders", error: error.message });
+  }
+});
+
+app.post("/api/orders", async (req, res) => {
+  try {
+    const { orderId, zone, eta, value, risk, userUid } = req.body;
+
+    if (!orderId || !zone || !eta || value === undefined || !risk) {
+      return res.status(400).json({ message: "orderId, zone, eta, value, and risk are required" });
+    }
+
+    const order = await Order.findOneAndUpdate(
+      { orderId },
+      {
+        $set: {
+          orderId,
+          zone,
+          eta,
+          value: Number(value),
+          risk,
+          userUid: userUid || "",
+        },
+      },
+      { upsert: true, new: true, runValidators: true }
+    ).lean();
+
+    return res.status(201).json(order);
+  } catch (error) {
+    return res.status(500).json({ message: "Failed to save order", error: error.message });
+  }
+});
+
+app.get("/api/claims", async (req, res) => {
+  try {
+    const { uid } = req.query;
+    const claims = await Claim.find(uid ? { userUid: uid } : {})
+      .sort({ createdAt: -1 })
+      .lean();
+
+    return res.json(claims);
+  } catch (error) {
+    return res.status(500).json({ message: "Failed to fetch claims", error: error.message });
+  }
+});
+
+app.post("/api/claims", async (req, res) => {
+  try {
+    const { claimId, date, reason, amount, status, userUid } = req.body;
+
+    if (!claimId || !date || !reason || amount === undefined || !status) {
+      return res.status(400).json({ message: "claimId, date, reason, amount, and status are required" });
+    }
+
+    const claim = await Claim.findOneAndUpdate(
+      { claimId },
+      {
+        $set: {
+          claimId,
+          date,
+          reason,
+          amount: Number(amount),
+          status,
+          userUid: userUid || "",
+        },
+      },
+      { upsert: true, new: true, runValidators: true }
+    ).lean();
+
+    return res.status(201).json(claim);
+  } catch (error) {
+    return res.status(500).json({ message: "Failed to save claim", error: error.message });
   }
 });
 

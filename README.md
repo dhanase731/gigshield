@@ -17,6 +17,14 @@ This project now includes:
 
 - `GET /api/health` – Backend service health
 - `GET /api/dashboard-summary` – Sample dashboard summary data
+- `GET /api/orders` and `POST /api/orders` – MongoDB-backed delivery orders
+- `GET /api/claims` and `POST /api/claims` – MongoDB-backed claims
+
+## Admin Console
+
+- Route: `/admin`
+- Shows live MongoDB summary, recent orders, and recent claims
+- Lets you create or update order and claim documents directly from the UI
 
 ## Environment Variables
 
