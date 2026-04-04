@@ -177,8 +177,12 @@ app.put("/api/users/:uid/insurance", async (req, res) => {
     const profile = await UserProfile.findOneAndUpdate(
       { uid },
       { $set: { weeklyPay: parsedWeeklyPay } },
-      { upsert: true, new: true, runValidators: true }
+      { upsert: false, new: true, runValidators: true }
     ).lean();
+
+    if (!profile) {
+      return res.status(404).json({ message: "Profile not found" });
+    }
 
     return res.json({ weeklyPay: profile.weeklyPay || 0 });
   } catch (error) {
