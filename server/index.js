@@ -99,15 +99,30 @@ app.put("/api/users/:uid/profile", async (req, res) => {
       return res.status(400).json({ message: "email is required" });
     }
 
+    const updateSet = {
+      uid,
+      email,
+    };
+
+    if (name !== undefined) {
+      updateSet.name = name || "User";
+    }
+    if (phone !== undefined) {
+      updateSet.phone = phone || "";
+    }
+    if (location !== undefined) {
+      updateSet.location = location || "";
+    }
+
     const profile = await UserProfile.findOneAndUpdate(
       { uid },
       {
-        $set: {
-          uid,
-          email,
-          name: name || "User",
-          phone: phone || "",
-          location: location || "",
+        $set: updateSet,
+        $setOnInsert: {
+          name: "User",
+          phone: "",
+          location: "",
+          weeklyPay: 0,
         },
       },
       { upsert: true, new: true, runValidators: true }

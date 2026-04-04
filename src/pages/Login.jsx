@@ -14,7 +14,18 @@ function Login() {
 
   const syncProfileFromApi = useCallback(async (user) => {
     try {
-      const { data } = await axios.get(`/api/users/${user.uid}/profile`);
+      const localProfileRaw = localStorage.getItem("userProfile");
+      const localProfile = localProfileRaw ? JSON.parse(localProfileRaw) : {};
+
+      const payload = {
+        uid: user.uid,
+        email: user.email,
+        name: localProfile.name || user.displayName || "User",
+        phone: localProfile.phone,
+        location: localProfile.location,
+      };
+
+      const { data } = await axios.put(`/api/users/${user.uid}/profile`, payload);
       localStorage.setItem("userProfile", JSON.stringify(data));
       return data;
     } catch {
@@ -26,7 +37,6 @@ function Login() {
         uid: user.uid,
       };
 
-      await axios.put(`/api/users/${user.uid}/profile`, fallbackProfile);
       localStorage.setItem("userProfile", JSON.stringify(fallbackProfile));
       return fallbackProfile;
     }
