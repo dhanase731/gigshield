@@ -5,6 +5,7 @@ import Profile from "./Profile";
 import InsuranceManagement from "./InsuranceManagement";
 import DrivingHours from "./DrivingHours";
 import WeatherMonitor from "./WeatherMonitor";
+import gigshieldLogo from "../assets/gigshield-logo.svg";
 
 function Dashboard() {
   const navigate = useNavigate();
@@ -195,7 +196,7 @@ function Dashboard() {
       <aside className="sidebar">
         <div className="sidebar-header">
           <div className="logo-container">
-            <img src="/src/assets/gigshield-logo.svg" alt="GigShield Logo" className="sidebar-logo" />
+            <img src={gigshieldLogo} alt="GigShield Logo" className="sidebar-logo" />
             <h2>GigShield</h2>
           </div>
           <p className="user-name">{userProfile?.name || "User"}</p>

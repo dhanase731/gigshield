@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import gigshieldLogo from "../assets/gigshield-logo.svg";
 
 function InsuranceSetup() {
   const [amount, setAmount] = useState("");
@@ -12,7 +13,7 @@ function InsuranceSetup() {
       <div className="card auth-shell insurance-shell">
         <div className="auth-aside">
           <div className="brand brand-left">
-            <img src="/src/assets/gigshield-logo.svg" alt="GigShield Logo" className="logo" />
+            <img src={gigshieldLogo} alt="GigShield Logo" className="logo" />
             <h2>Protection Checkout</h2>
           </div>
           <p className="auth-copy">Choose a weekly protection amount and activate weather-linked order safety instantly.</p>

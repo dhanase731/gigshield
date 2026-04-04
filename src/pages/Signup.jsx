@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { createUserWithEmailAndPassword, signInWithRedirect } from "firebase/auth";
 import { auth, provider } from "../firebase";
+import gigshieldLogo from "../assets/gigshield-logo.svg";
 
 function Signup() {
   const navigate = useNavigate();
@@ -65,7 +66,7 @@ function Signup() {
       <div className="card auth-shell">
         <div className="auth-aside">
           <div className="brand brand-left">
-            <img src="/src/assets/gigshield-logo.svg" alt="GigShield Logo" className="logo" />
+            <img src={gigshieldLogo} alt="GigShield Logo" className="logo" />
             <h2>New Partner Setup</h2>
           </div>
           <p className="auth-copy">Create your protected ops profile in under 2 minutes.</p>
