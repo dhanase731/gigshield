@@ -136,13 +136,10 @@ app.put("/api/users/:uid/profile", async (req, res) => {
       {
         $set: updateSet,
         $setOnInsert: {
-          name: "User",
-          phone: "",
-          location: "",
           weeklyPay: 0,
         },
       },
-      { upsert: true, new: true, runValidators: true }
+      { upsert: true, new: true, runValidators: true, setDefaultsOnInsert: true }
     ).lean();
 
     return res.json(profile);
