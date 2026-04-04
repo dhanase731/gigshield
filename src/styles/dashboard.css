@@ -398,6 +398,7 @@
 .profile-container,
 .insurance-container,
 .claims-container,
+.money-container,
 .hours-container,
 .weather-container {
   max-width: 100%;
@@ -406,6 +407,7 @@
 .profile-container .card,
 .insurance-container .card,
 .claims-container .card,
+.money-container .card,
 .hours-container .card,
 .weather-container .card {
   background: rgba(255, 255, 255, 0.95);
@@ -419,6 +421,7 @@
 .profile-container .card h2,
 .insurance-container .card h2,
 .claims-container .card h2,
+.money-container .card h2,
 .hours-container .card h2,
 .weather-container .card h2 {
   color: var(--primary-orange);
@@ -902,6 +905,94 @@
   margin-bottom: 12px;
 }
 
+/* Money Management Specific */
+.money-top-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.money-input-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.money-input-grid label {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 14px;
+  color: #444;
+}
+
+.money-input-grid input {
+  border: 1px solid rgba(255, 152, 0, 0.3);
+  border-radius: 8px;
+  padding: 9px 10px;
+  font-family: inherit;
+}
+
+.money-ok-banner {
+  background: rgba(76, 175, 80, 0.12);
+  border: 1px solid rgba(76, 175, 80, 0.3);
+  color: #2e7d32;
+  border-radius: 10px;
+  padding: 10px 12px;
+  margin: 0 0 14px;
+  font-size: 13px;
+}
+
+.money-bucket-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 10px;
+}
+
+.money-actions-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.money-actions-list p {
+  margin: 4px 0 0;
+}
+
+.money-overview-grid {
+  display: grid;
+  grid-template-columns: 1.3fr 1fr;
+  gap: 16px;
+  margin-bottom: 18px;
+}
+
+.money-metric-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 10px;
+}
+
+.money-metric-grid p {
+  margin: 0 0 4px;
+  color: #777;
+  font-size: 12px;
+}
+
+.money-metric-grid strong {
+  color: var(--primary-orange);
+}
+
+.money-guidance-list {
+  margin: 0;
+  padding-left: 18px;
+  color: #555;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
 /* Hours Specific */
 .hours-overview {
   display: grid;
@@ -1217,7 +1308,8 @@
   }
 
   .claims-main-grid,
-  .claims-dual-grid {
+  .claims-dual-grid,
+  .money-overview-grid {
     grid-template-columns: 1fr;
   }
 

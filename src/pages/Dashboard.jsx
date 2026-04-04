@@ -4,6 +4,7 @@ import axios from "axios";
 import Profile from "./Profile";
 import InsuranceManagement from "./InsuranceManagement";
 import ClaimManagement from "./ClaimManagement";
+import MoneyManagement from "./MoneyManagement";
 import DrivingHours from "./DrivingHours";
 import WeatherMonitor from "./WeatherMonitor";
 import gigshieldLogo from "../assets/gigshield-logo.svg";
@@ -15,11 +16,36 @@ function Dashboard() {
   const [lastSync, setLastSync] = useState("Checking...");
   const [todayOrders, setTodayOrders] = useState([]);
   const [claimsTimeline, setClaimsTimeline] = useState([]);
+  const [allClaims, setAllClaims] = useState([]);
   const userProfile = useMemo(() => {
     const profile = localStorage.getItem("userProfile");
     return profile ? JSON.parse(profile) : null;
   }, []);
   const [weeklyPay, setWeeklyPay] = useState(localStorage.getItem("weeklyPay") || "0");
+
+  const moneySnapshot = useMemo(() => {
+    const openClaims = allClaims.filter((claim) => !["Approved", "Settled", "Rejected"].includes(claim.status));
+    const openExposure = openClaims.reduce((sum, claim) => sum + Number(claim.amount || 0), 0);
+    const claimPayouts = allClaims
+      .filter((claim) => ["Approved", "Settled"].includes(claim.status))
+      .reduce((sum, claim) => sum + Number(claim.amount || 0), 0);
+
+    const weeklyContribution = Number(weeklyPay || 0);
+    const reserveTarget = Math.max(weeklyContribution * 4, Math.round(openExposure * 0.3));
+    const reserveAvailable = Math.round(claimPayouts + weeklyContribution * 2);
+    const reserveCoverage = reserveTarget > 0
+      ? Math.min(100, Math.round((reserveAvailable / reserveTarget) * 100))
+      : 100;
+
+    return {
+      openExposure,
+      claimPayouts,
+      reserveTarget,
+      reserveAvailable,
+      reserveCoverage,
+      openClaimCount: openClaims.length,
+    };
+  }, [allClaims, weeklyPay]);
 
   useEffect(() => {
     if (!userProfile) {
@@ -32,14 +58,17 @@ function Dashboard() {
 
     const checkServiceStatus = async () => {
       try {
-        const [healthResponse, summaryResponse] = await Promise.all([
+        const [healthResponse, summaryResponse, claimsResponse] = await Promise.all([
           axios.get("/api/health"),
           axios.get(`/api/dashboard-summary${userProfile?.uid ? `?uid=${userProfile.uid}` : ""}`),
+          axios.get(`/api/claims${userProfile?.uid ? `?uid=${userProfile.uid}` : ""}`),
         ]);
 
         const healthData = healthResponse.data;
         const summaryData = summaryResponse.data;
         if (!mounted) return;
+
+        const fetchedClaims = Array.isArray(claimsResponse?.data) ? claimsResponse.data : [];
 
         const reportedAt = new Date(healthData.timestamp || Date.now());
         setServiceStatus(healthData.status || "Operational");
@@ -59,6 +88,7 @@ function Dashboard() {
             state: claim.status === "Approved" ? "done" : "live",
           }))
         );
+        setAllClaims(fetchedClaims);
         if (typeof summaryData.weeklyPay === "number") {
           setWeeklyPay(String(summaryData.weeklyPay));
           localStorage.setItem("weeklyPay", String(summaryData.weeklyPay));
@@ -92,6 +122,8 @@ function Dashboard() {
         return <InsuranceManagement />;
       case "claims":
         return <ClaimManagement />;
+      case "money":
+        return <MoneyManagement />;
       case "hours":
         return <DrivingHours />;
       case "weather":
@@ -130,8 +162,13 @@ function Dashboard() {
                 </div>
                 <div className="kpi-card">
                   <p className="kpi-label">Claims Readiness</p>
-                  <h3>High</h3>
-                  <span>Weather-linked claim automation active</span>
+                  <h3>{moneySnapshot.openClaimCount > 0 ? "Watch" : "Stable"}</h3>
+                  <span>{moneySnapshot.openClaimCount} active claims to monitor</span>
+                </div>
+                <div className="kpi-card">
+                  <p className="kpi-label">Money Guard</p>
+                  <h3>{moneySnapshot.reserveCoverage}%</h3>
+                  <span>Reserve coverage against active claim exposure</span>
                 </div>
               </div>
 
@@ -181,8 +218,47 @@ function Dashboard() {
                 </section>
               </div>
 
+              <div className="money-overview-grid">
+                <section className="overview-card ops-panel">
+                  <div className="panel-header">
+                    <h3>Money Management Snapshot</h3>
+                    <button className="mini-btn" onClick={() => setActiveSection("money")}>Open money board</button>
+                  </div>
+                  <div className="money-metric-grid">
+                    <div>
+                      <p>Open Exposure</p>
+                      <strong>₹{moneySnapshot.openExposure}</strong>
+                    </div>
+                    <div>
+                      <p>Payouts Received</p>
+                      <strong>₹{moneySnapshot.claimPayouts}</strong>
+                    </div>
+                    <div>
+                      <p>Reserve Available</p>
+                      <strong>₹{moneySnapshot.reserveAvailable}</strong>
+                    </div>
+                    <div>
+                      <p>Reserve Target</p>
+                      <strong>₹{moneySnapshot.reserveTarget}</strong>
+                    </div>
+                  </div>
+                </section>
+
+                <section className="overview-card ops-panel">
+                  <div className="panel-header">
+                    <h3>Payout & Cashflow Guidance</h3>
+                  </div>
+                  <ul className="money-guidance-list">
+                    <li>Keep emergency reserve in a fast-access account.</li>
+                    <li>Split settlement funds into repair, debt, and emergency buckets.</li>
+                    <li>Review budget monthly; adjust when claim volume rises.</li>
+                  </ul>
+                </section>
+              </div>
+
               <div className="quick-actions">
                 <button className="action-btn" onClick={() => setActiveSection("claims")}>File new claim</button>
+                <button className="action-btn" onClick={() => setActiveSection("money")}>Manage money</button>
                 <button className="action-btn" onClick={() => setActiveSection("hours")}>Track driving hours</button>
                 <button className="action-btn" onClick={() => setActiveSection("profile")}>Update profile</button>
                 <button className="action-btn" onClick={() => setActiveSection("weather")}>Run emergency drill</button>
@@ -242,6 +318,14 @@ function Dashboard() {
               </button>
             </li>
             <li>
+              <button
+                className={`nav-btn ${activeSection === "money" ? "active" : ""}`}
+                onClick={() => setActiveSection("money")}
+              >
+                Money Management
+              </button>
+            </li>
+            <li>
               <button 
                 className={`nav-btn ${activeSection === "hours" ? "active" : ""}`}
                 onClick={() => setActiveSection("hours")}
@@ -276,6 +360,7 @@ function Dashboard() {
               {activeSection === "profile" && "User Profile"}
               {activeSection === "insurance" && "Insurance Management"}
               {activeSection === "claims" && "Claim Management"}
+              {activeSection === "money" && "Money Management"}
               {activeSection === "hours" && "Driving Hours"}
               {activeSection === "weather" && "Weather Monitor"}
             </h1>
