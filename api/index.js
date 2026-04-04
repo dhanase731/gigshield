@@ -5,9 +5,11 @@ export default async function handler(req, res) {
     await connectToMongo();
     return app(req, res);
   } catch (error) {
+    const details = error?.message || "Unknown API initialization error";
+
     return res.status(500).json({
-      message: "Failed to initialize API",
-      error: error.message,
+      message: details,
+      error: details,
     });
   }
 }

@@ -104,13 +104,13 @@ function InsuranceSetup() {
                     navigate("/dashboard");
                     return;
                   } catch (retryError) {
-                    const retryMessage = retryError?.response?.data?.message || retryError?.message;
+                    const retryMessage = retryError?.response?.data?.error || retryError?.response?.data?.message || retryError?.message;
                     window.alert(`Unable to save insurance plan: ${retryMessage || "Please try again."}`);
                     return;
                   }
                 }
 
-                const serverMessage = error?.response?.data?.message || error?.message;
+                const serverMessage = error?.response?.data?.error || error?.response?.data?.message || error?.message;
                 window.alert(`Unable to save insurance plan: ${serverMessage || "Please try again."}`);
               }
             }}

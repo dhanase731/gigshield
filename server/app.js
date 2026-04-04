@@ -6,7 +6,6 @@ import mongoose from "mongoose";
 dotenv.config();
 
 export const app = express();
-const mongoUri = process.env.MONGODB_URI;
 
 const userSchema = new mongoose.Schema(
   {
@@ -55,8 +54,10 @@ app.use(express.json());
 let connectionPromise = null;
 
 export const connectToMongo = async () => {
+  const mongoUri = process.env.MONGODB_URI?.trim();
+
   if (!mongoUri) {
-    throw new Error("MONGODB_URI is missing in .env");
+    throw new Error("MONGODB_URI is not configured in the deployment environment");
   }
 
   if (mongoose.connection.readyState === 1) {
