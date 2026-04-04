@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import Profile from "./Profile";
 import InsuranceManagement from "./InsuranceManagement";
+import ClaimManagement from "./ClaimManagement";
 import DrivingHours from "./DrivingHours";
 import WeatherMonitor from "./WeatherMonitor";
 import gigshieldLogo from "../assets/gigshield-logo.svg";
@@ -89,6 +90,8 @@ function Dashboard() {
         return <Profile />;
       case "insurance":
         return <InsuranceManagement />;
+      case "claims":
+        return <ClaimManagement />;
       case "hours":
         return <DrivingHours />;
       case "weather":
@@ -162,7 +165,7 @@ function Dashboard() {
                 <section className="overview-card ops-panel">
                   <div className="panel-header">
                     <h3>Protection Timeline</h3>
-                    <button className="mini-btn" onClick={() => setActiveSection("insurance")}>Manage policy</button>
+                    <button className="mini-btn" onClick={() => setActiveSection("claims")}>Open claims</button>
                   </div>
                   <div className="timeline">
                     {claimsTimeline.map((item) => (
@@ -179,6 +182,7 @@ function Dashboard() {
               </div>
 
               <div className="quick-actions">
+                <button className="action-btn" onClick={() => setActiveSection("claims")}>File new claim</button>
                 <button className="action-btn" onClick={() => setActiveSection("hours")}>Track driving hours</button>
                 <button className="action-btn" onClick={() => setActiveSection("profile")}>Update profile</button>
                 <button className="action-btn" onClick={() => setActiveSection("weather")}>Run emergency drill</button>
@@ -230,6 +234,14 @@ function Dashboard() {
               </button>
             </li>
             <li>
+              <button
+                className={`nav-btn ${activeSection === "claims" ? "active" : ""}`}
+                onClick={() => setActiveSection("claims")}
+              >
+                Claims
+              </button>
+            </li>
+            <li>
               <button 
                 className={`nav-btn ${activeSection === "hours" ? "active" : ""}`}
                 onClick={() => setActiveSection("hours")}
@@ -263,6 +275,7 @@ function Dashboard() {
               {activeSection === "overview" && "Dashboard Overview"}
               {activeSection === "profile" && "User Profile"}
               {activeSection === "insurance" && "Insurance Management"}
+              {activeSection === "claims" && "Claim Management"}
               {activeSection === "hours" && "Driving Hours"}
               {activeSection === "weather" && "Weather Monitor"}
             </h1>
