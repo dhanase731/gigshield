@@ -64,15 +64,54 @@ function InsuranceSetup() {
                 return;
               }
 
+              const saveInsurance = async () => axios.put(`/api/users/${userProfile.uid}/insurance`, {
+                weeklyPay: Number(amount),
+              });
+
               try {
-                const { data } = await axios.put(`/api/users/${userProfile.uid}/insurance`, {
-                  weeklyPay: Number(amount),
-                });
+                const { data } = await saveInsurance();
 
                 localStorage.setItem("weeklyPay", String(data.weeklyPay || Number(amount)));
                 navigate("/dashboard");
-              } catch {
-                window.alert("Unable to save insurance plan. Please try again.");
+              } catch (error) {
+                const status = error?.response?.status;
+
+                if (status === 404) {
+                  try {
+                    if (!userProfile.email) {
+                      window.alert("Profile is incomplete. Please login again to continue.");
+                      navigate("/");
+                      return;
+                    }
+
+                    const profilePayload = {
+                      uid: userProfile.uid,
+                      email: userProfile.email,
+                      name: userProfile.name || "User",
+                      phone: userProfile.phone,
+                      location: userProfile.location,
+                    };
+
+                    const { data: profileData } = await axios.put(
+                      `/api/users/${userProfile.uid}/profile`,
+                      profilePayload
+                    );
+
+                    localStorage.setItem("userProfile", JSON.stringify(profileData));
+
+                    const { data } = await saveInsurance();
+                    localStorage.setItem("weeklyPay", String(data.weeklyPay || Number(amount)));
+                    navigate("/dashboard");
+                    return;
+                  } catch (retryError) {
+                    const retryMessage = retryError?.response?.data?.message || retryError?.message;
+                    window.alert(`Unable to save insurance plan: ${retryMessage || "Please try again."}`);
+                    return;
+                  }
+                }
+
+                const serverMessage = error?.response?.data?.message || error?.message;
+                window.alert(`Unable to save insurance plan: ${serverMessage || "Please try again."}`);
               }
             }}
           >
